@@ -17,62 +17,66 @@ const WeatherApp = () => {
 
   const search = async () => {
     const element = document.getElementsByClassName("cityInput");
-    if (element[0] === "") {
-      return 0;
+    if (element[0].value === "") {
+      return;
     }
     const city = element[0].value;
-    const api_url =
-      "https://api.openweathermap.org/data/2.5/weather?units=Metric";
+    const api_url = "https://api.openweathermap.org/data/2.5/weather?units=Metric";
     const full_url = `${api_url}&q=${city}&appid=${api_key}`;
-
-    let response = await fetch(full_url);
-    let data = await response.json();
-    const humidity = document.getElementsByClassName("humidity-percent");
-    const wind = document.getElementsByClassName("wind-rate");
-    const temperature = document.getElementsByClassName("weather-temp");
-    const location = document.getElementsByClassName("weather-location");
-
-    humidity[0].innerHTML = data.main.humidity + " %";
-    wind[0].innerHTML = data.wind.speed + " km/h";
-    temperature[0].innerHTML = data.main.temp + " &deg;C";
-    location[0].innerHTML = data.name;
-
-    if (data.weather[0].icon === "01d" || data.weather[0].icon === "01n") {
-      setWicon(clear_icon);
-    } else if (
-      data.weather[0].icon === "02d" ||
-      data.weather[0].icon === "02n"
-    ) {
-      setWicon(cloud_icon);
-    } else if (
-      data.weather[0].icon === "03d" ||
-      data.weather[0].icon === "03n"
-    ) {
-      setWicon(drizzle_icon);
-    } else if (
-      data.weather[0].icon === "04d" ||
-      data.weather[0].icon === "04n"
-    ) {
-      setWicon(drizzle_icon);
-    } else if (
-      data.weather[0].icon === "09d" ||
-      data.weather[0].icon === "09n"
-    ) {
-      setWicon(rain_icon);
-    } else if (
-      data.weather[0].icon === "10d" ||
-      data.weather[0].icon === "10n"
-    ) {
-      setWicon(rain_icon);
-    } else if (
-      data.weather[0].icon === "13d" ||
-      data.weather[0].icon === "13n"
-    ) {
-      setWicon(snow_icon);
-    } else {
-      setWicon(clear_icon);
+  
+    try {
+      let response = await fetch(full_url);
+      let data = await response.json();
+  
+      if (response.ok) {
+        const humidity = document.getElementsByClassName("humidity-percent");
+        const wind = document.getElementsByClassName("wind-rate");
+        const temperature = document.getElementsByClassName("weather-temp");
+        const location = document.getElementsByClassName("weather-location");
+  
+        humidity[0].innerHTML = data.main.humidity + " %";
+        wind[0].innerHTML = data.wind.speed + " km/h";
+        temperature[0].innerHTML = data.main.temp + " &deg;C";
+        location[0].innerHTML = data.name;
+  
+        switch (data.weather[0].icon) {
+          case "01d":
+          case "01n":
+            setWicon(clear_icon);
+            break;
+          case "02d":
+          case "02n":
+            setWicon(cloud_icon);
+            break;
+          case "03d":
+          case "03n":
+          case "04d":
+          case "04n":
+            setWicon(drizzle_icon);
+            break;
+          case "09d":
+          case "09n":
+          case "10d":
+            case "10n":
+            setWicon(rain_icon);
+            break;
+          case "13d":
+          case "13n":
+            setWicon(snow_icon);
+            break;
+          default:
+            setWicon(clear_icon);
+        }
+      } else {
+        console.error("Error fetching weather data: ", data.message);
+        alert("Error fetching weather data: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching weather data: ", error);
+      alert("Error fetching weather data. Please try again later.");
     }
   };
+  
 
   return (
     <div className="container">
